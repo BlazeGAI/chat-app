@@ -18,25 +18,25 @@
   --error-bg: #fdecec;
   --error-text: #8a1c1c;
   --heading-font: Montserrat, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #121815;
-    --text: #e8eaed;
-    --muted: #a9b3ad;
-    --border: #2f3a34;
-    --tint: #18211c;
-    --student-bg: #1f3d30;
-    --bot-bg: #1e2622;
-    --accent: var(--gold);
-    --accent-hover: #f0c22a;
-    --accent-text: var(--green);
-    --focus: var(--gold);
-    --error-bg: #4a1f1f;
-    --error-text: #ffd6d6;
-  }
+/* data-theme is set before the page draws (see index.html): the student's choice, or the device setting. */
+:root[data-theme="dark"] {
+  --bg: #121815;
+  --text: #e8eaed;
+  --muted: #a9b3ad;
+  --border: #2f3a34;
+  --tint: #18211c;
+  --student-bg: #1f3d30;
+  --bot-bg: #1e2622;
+  --accent: var(--gold);
+  --accent-hover: #f0c22a;
+  --accent-text: var(--green);
+  --focus: var(--gold);
+  --error-bg: #4a1f1f;
+  --error-text: #ffd6d6;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -80,7 +80,7 @@ body {
   font-weight: 700;
 }
 
-.actions { display: flex; gap: 8px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
 button {
   font: inherit;
@@ -107,6 +107,8 @@ button:hover:not(:disabled) {
   padding: 6px 12px;
 }
 
+/* The dark-mode toggle is filled in while dark mode is on. */
+.bar button[aria-pressed="true"],
 .bar button:hover:not(:disabled) {
   background: #ffffff;
   border-color: #ffffff;
@@ -154,9 +156,7 @@ button:focus-visible, textarea:focus-visible, .log:focus-visible {
 
 .message.assistant .who { color: var(--green); }
 
-@media (prefers-color-scheme: dark) {
-  .message.assistant .who { color: var(--gold); }
-}
+:root[data-theme="dark"] .message.assistant .who { color: var(--gold); }
 
 .message.user .who { text-align: right; }
 

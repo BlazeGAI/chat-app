@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
   <title>Chatbot</title>
+  <script>
+    // Set the light or dark theme before the page draws: the student's saved choice, otherwise the device setting.
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('theme'); } catch (e) {}
+      var dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap">
@@ -15,7 +24,8 @@
     <header class="bar">
       <h1 id="title">Loading…</h1>
       <div class="actions">
-        <button type="button" id="copy" class="secondary">Copy conversation</button>
+        <button type="button" id="theme" class="secondary" aria-pressed="false">Dark mode</button>
+        <button type="button" id="copy" class="secondary">Copy chat</button>
         <button type="button" id="reset" class="secondary">Start over</button>
       </div>
     </header>

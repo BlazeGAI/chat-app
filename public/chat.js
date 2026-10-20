@@ -11,6 +11,7 @@ const els = {
   form: document.getElementById('form'),
   input: document.getElementById('input'),
   send: document.getElementById('send'),
+  theme: document.getElementById('theme'),
   copy: document.getElementById('copy'),
   reset: document.getElementById('reset'),
   notice: document.getElementById('notice'),
@@ -182,6 +183,39 @@ els.copy.addEventListener('click', async () => {
   els.copy.textContent = copied ? 'Copied' : 'Copy failed';
   announce(copied ? 'Conversation copied to the clipboard.' : 'The conversation could not be copied.');
   setTimeout(() => { els.copy.textContent = label; }, 2000);
+});
+
+// Light/dark toggle. index.html sets the starting theme; a student's choice is remembered in their browser.
+const darkQuery = matchMedia('(prefers-color-scheme: dark)');
+
+function setTheme(theme, remember) {
+  document.documentElement.dataset.theme = theme;
+  els.theme.setAttribute('aria-pressed', String(theme === 'dark'));
+  if (!remember) return;
+  try {
+    localStorage.setItem('theme', theme);
+  } catch {
+    // Storage can be blocked in some Moodle iframes; the toggle still works for this visit.
+  }
+}
+
+function hasSavedTheme() {
+  try {
+    return Boolean(localStorage.getItem('theme'));
+  } catch {
+    return false;
+  }
+}
+
+setTheme(document.documentElement.dataset.theme, false);
+
+els.theme.addEventListener('click', () => {
+  setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true);
+});
+
+// Until a student picks a theme, follow the device if its setting changes.
+darkQuery.addEventListener('change', (event) => {
+  if (!hasSavedTheme()) setTheme(event.matches ? 'dark' : 'light', false);
 });
 
 async function copyText(text) {
