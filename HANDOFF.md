@@ -73,7 +73,7 @@ Add this to a Moodle Page, Label or Book. In the text editor, switch to the HTML
 ```
 
 - `title` is read aloud by screen readers. Use the bot's name, for example `title="Jordan Ellis role-play chatbot"`.
-- `allow="clipboard-write"` lets the **Copy conversation** button work. That's useful when students paste a transcript into an assignment.
+- `allow="clipboard-write"` lets the **Copy chat** button work. That's useful when students paste a transcript into an assignment.
 - If Moodle removes the iframe when you save, your account needs the "trust content" permission. Ask a Moodle administrator.
 
 ---
@@ -83,8 +83,9 @@ Add this to a Moodle Page, Label or Book. In the text editor, switch to the HTML
 - The title, the description, and the bot's welcome message.
 - A message box. **Enter** sends, and **Shift+Enter** starts a new line.
 - **Start over** clears the conversation.
-- **Copy conversation** copies the full transcript.
-- The chat works with a keyboard and screen readers, follows the device's light or dark setting, and fits on a phone.
+- **Copy chat** copies the full transcript.
+- **Dark mode** switches between a light and dark background. The chat starts in the device's setting, and the student's choice is remembered in their browser.
+- The chat works with a keyboard and screen readers and fits on a phone.
 - Refreshing or leaving the page clears the conversation. Tell students this if an activity asks them to submit a transcript.
 
 ---
