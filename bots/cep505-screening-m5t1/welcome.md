@@ -1,0 +1,1 @@
+I've been thinking about starting an exercise program. My doctor mentioned that becoming more active would probably be a good idea. I've noticed I get winded more easily than I used to, so I wanted to talk with someone before joining a gym.

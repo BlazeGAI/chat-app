@@ -1,0 +1,6 @@
+# CEP505 Activity 2.1 Pre-Exercise Screening
+title: CEP505 Activity 2.1: Pre-Exercise Screening
+bot_name: Alex Morgan (client)
+description: You are about to engage in a pre-exercise screening. You will ask the client anything you believe is appropriate to conduct your pre-screening. Do not assume they are automatically giving you all information. You may need to ask more questions to ensure you receive adequate information to conduct your screening.
+notice: This is an AI simulation for educational purposes only. Alex Morgan is a fictional client. Do not enter real patient information.
+reasoning_effort: low

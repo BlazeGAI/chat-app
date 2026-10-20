@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Chatbot</title>
+  <link rel="stylesheet" href="/chat.css">
+</head>
+<body>
+  <div class="app">
+    <header class="bar">
+      <h1 id="title">Loading…</h1>
+      <div class="actions">
+        <button type="button" id="copy" class="secondary">Copy conversation</button>
+        <button type="button" id="reset" class="secondary">Start over</button>
+      </div>
+    </header>
+
+    <p id="description" class="description" hidden></p>
+
+    <main id="log" class="log" aria-label="Conversation" tabindex="0"></main>
+
+    <form id="form" class="composer">
+      <label for="input" class="visually-hidden">Your message</label>
+      <textarea id="input" rows="2" placeholder="Type your message… (Enter to send, Shift+Enter for a new line)" disabled></textarea>
+      <button type="submit" id="send" disabled>Send</button>
+    </form>
+
+    <p id="notice" class="notice" hidden></p>
+    <div id="announcer" class="visually-hidden" aria-live="polite"></div>
+  </div>
+  <script src="/chat.js"></script>
+</body>
+</html>

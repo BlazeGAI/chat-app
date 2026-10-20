@@ -1,0 +1,5 @@
+# DCJ820 Executive Policy Development Coach
+title: DCJ820 Executive Policy Development Coach
+bot_name: Policy Coach
+notice: This coach is an AI tool for practice. It will not write your assignment. Anonymize people, agencies, and cases.
+reasoning_effort: low

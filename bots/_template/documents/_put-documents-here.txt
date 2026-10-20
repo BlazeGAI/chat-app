@@ -1,0 +1,3 @@
+Put this bot's reference documents in this folder as .txt or .md files.
+The bot reads all of them before every answer.
+Files whose names start with _ (like this one) are ignored.

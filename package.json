@@ -1,0 +1,9 @@
+{
+  "name": "course-chatbots",
+  "private": true,
+  "type": "module",
+  "description": "Embeddable course chatbots for Moodle. No dependencies on purpose.",
+  "scripts": {
+    "preview": "node scripts/local-preview.js"
+  }
+}

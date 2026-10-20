@@ -1,0 +1,23 @@
+# Lines starting with # are notes and are ignored. Delete any line you don't need.
+
+# Shown at the top of the chat window.
+title: Course name: Bot name
+
+# The label over the bot's messages, for example a persona's name.
+bot_name: Assistant
+
+# Optional. Shown under the title, like a custom GPT's description.
+description: Tell students what this bot is for and how to start.
+
+# Optional. Small print under the message box.
+notice: This is an AI tool for practice. Do not enter personal information.
+
+# Optional. How long the bot "thinks" before answering: minimal, low, medium or high.
+# Low is fast and works well for role-plays. Try medium if the bot misses steps in its instructions.
+reasoning_effort: low
+
+# Optional. The most messages a student can send before they must "Start over". Default is 40.
+# max_turns: 40
+
+# Optional. A different OpenAI model for this bot only. Usually leave this out.
+# model: gpt-5-mini
