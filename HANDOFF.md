@@ -8,6 +8,8 @@ Each chatbot is a **folder of plain text files**. You never need to edit code to
 
 ## 1. Make a new chatbot
 
+**The easier way: the admin app.** If your team has set it up, sign in to the admin website, open **Create a bot**, fill in the form and click **Create bot**. It gives you the test link and the Moodle embed code, and you can upload documents as PDF or Word. See [admin/README.md](admin/README.md) for what it does and how to set it up. The steps below are the original way, using folders on GitHub, and still work.
+
 You can do all of this in the GitHub website. You don't need any software on your computer.
 
 1. Open the repository on GitHub and go into the `bots` folder.

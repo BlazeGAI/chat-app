@@ -1,0 +1,12 @@
+# Tiffin University colors, matching the chat window.
+[theme]
+primaryColor = "#154734"
+backgroundColor = "#ffffff"
+secondaryBackgroundColor = "#f1f5f2"
+textColor = "#1d2125"
+
+[client]
+toolbarMode = "minimal"
+
+[server]
+maxUploadSize = 25

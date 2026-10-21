@@ -3,3 +3,8 @@
 .vercel
 node_modules
 .DS_Store
+
+# Streamlit admin app
+admin/.streamlit/secrets.toml
+__pycache__
+.venv
