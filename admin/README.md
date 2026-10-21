@@ -47,6 +47,19 @@ Then **Deployments → ⋯ → Redeploy**. Without these two variables the site 
 3. Under **Advanced settings → Secrets**, paste the contents of [`.streamlit/secrets.toml.example`](.streamlit/secrets.toml.example) and fill in the values.
 4. Click **Deploy**. Bookmark the address it gives you; that's the admin site.
 
+### Keeping the admin site out of view
+
+The app can be **public** on Streamlit and still be protected. Visitors pass two locks before they see anything:
+
+1. **Access code.** The `ACCESS_CODE` secret is a shared code you give only to staff. It's asked for once per visit, before the sign-in page. To change it, edit it in **App settings → Secrets**; everyone then needs the new code.
+2. **Staff sign-in.** Each person's own Supabase email and password, and their email must be on the **Staff** list.
+
+Streamlit lists every public app in search engines, so the app's title is a neutral "Staff Tools" and a search result shows nothing about chatbots. Also:
+
+- In **App settings → General**, you can give the app a neutral address, such as `tu-staff-tools.streamlit.app`.
+- Anyone with write access to this GitHub repository can see the app's secrets. Keep that list short (**GitHub → Settings → Collaborators**).
+- In Supabase, **Authentication → Sign In / Providers**: turn off **Allow new users to sign up**, and set a minimum password length of 12 or more. Admins can still add people from the **Staff** page.
+
 Streamlit Community Cloud is free. Any host that runs Python works too (for example Render or an internal server): install `admin/requirements.txt` and run `streamlit run admin/app.py` with the same secrets.
 
 **The secret key can read and change every bot. Keep it only in Vercel's environment variables and Streamlit's secrets, never in a file in this repository.**
@@ -68,7 +81,7 @@ streamlit run app.py
 
 ## How it works (for whoever comes next)
 
-- `app.py` signs people in with Supabase Auth, checks the `staff` table for their role, and shows the pages that role may see.
+- `app.py` asks for the access code, signs people in with Supabase Auth, checks the `staff` table for their role, and shows the pages that role may see.
 - `views/create.py` is the **Create bots** section; `views/manage_bots.py` and `views/staff.py` are the **Admin** section.
 - `common.py` holds the Supabase calls, the bot form and the document uploader, shared by both sections.
 - All reads and writes use the secret key on the Streamlit server. Row Level Security is on with no policies, so the public key can't read the tables at all; it is used only to sign in.
