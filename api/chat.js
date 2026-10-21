@@ -3,7 +3,8 @@
 //   GET  /api/chat?bot=<folder>  -> the public settings the chat window needs (title, welcome message)
 //   POST /api/chat?bot=<folder>  -> sends the conversation to OpenAI and streams the reply back as plain text
 //
-// Each chatbot is a folder in /bots. Nothing is saved: the browser sends the whole
+// Each chatbot is a row in Supabase (made in the admin app, see admin/) or a folder in /bots.
+// If both exist, Supabase wins. Nothing is saved: the browser sends the whole
 // conversation with every message, and it is gone when the page is closed.
 //
 // This file deliberately uses no packages, so there are no library updates to break it.
@@ -23,7 +24,12 @@ const DEFAULT_MAX_TURNS = 40;
 const MAX_DOCUMENT_CHARS = 400000; // roughly 100,000 tokens across all of a bot's documents
 const BOTS_DIR = path.join(process.cwd(), 'bots');
 
-// Bot folders only change when the site is redeployed, so each one is read once per server instance.
+// Optional. Without these, only the folders in /bots are used.
+const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+// Each bot is kept for a minute per server instance, so edits in the admin app are live within a minute.
+const BOT_CACHE_MS = 60000;
 const botCache = new Map();
 
 export default async function handler(req, res) {
@@ -144,8 +150,60 @@ function replyTextFromEvent(line) {
 async function loadBot(botId) {
   // Folder names: lowercase letters, numbers and dashes. Folders starting with "_" (like _template) are never served.
   if (!/^[a-z0-9][a-z0-9-]{0,99}$/.test(botId)) throw notFound();
-  if (botCache.has(botId)) return botCache.get(botId);
+  const cached = botCache.get(botId);
+  if (cached && cached.expires > Date.now()) return cached.bot;
 
+  let parts = null;
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    try {
+      parts = await loadBotFromSupabase(botId);
+    } catch (err) {
+      if (err.notFound) throw err;
+      // If Supabase is down, folder bots still work.
+      console.error(err.message);
+      parts = await loadBotFromFolder(botId).catch((folderErr) => {
+        throw folderErr.notFound ? err : folderErr;
+      });
+    }
+  }
+  if (!parts) parts = await loadBotFromFolder(botId);
+  const bot = buildBot(parts);
+  botCache.set(botId, { bot, expires: Date.now() + BOT_CACHE_MS });
+  return bot;
+}
+
+// Returns the bot's parts, or null if Supabase has no bot with this name. A bot that has
+// been turned off in the admin app is "not found", even if a folder of the same name exists.
+async function loadBotFromSupabase(botId) {
+  const url = `${SUPABASE_URL}/rest/v1/bots?slug=eq.${botId}&select=*,bot_documents(name,content)`;
+  const headers = { apikey: SUPABASE_KEY };
+  // Older "service_role" keys are JWTs and also go in the Authorization header; newer "sb_secret_" keys don't.
+  if (SUPABASE_KEY.startsWith('eyJ')) headers.Authorization = `Bearer ${SUPABASE_KEY}`;
+
+  let rows;
+  try {
+    const res = await fetch(url, { headers, signal: AbortSignal.timeout(10000) });
+    if (!res.ok) throw new Error(`Supabase returned ${res.status}: ${await res.text()}`);
+    rows = await res.json();
+  } catch (err) {
+    throw new Error(`Supabase could not be read: ${err.message}`);
+  }
+  const row = rows[0];
+  if (!row) return null;
+  if (!row.is_active) throw notFound();
+
+  const settings = {};
+  for (const key of ['title', 'bot_name', 'description', 'notice', 'reasoning_effort', 'max_turns', 'model']) {
+    if (row[key] !== null && row[key] !== '') settings[key] = String(row[key]);
+  }
+  const documents = (row.bot_documents || [])
+    .map((doc) => ({ name: doc.name, text: (doc.content || '').trim() }))
+    .filter((doc) => doc.text)
+    .sort((a, b) => a.name.localeCompare(b.name));
+  return { instructions: (row.instructions || '').trim(), welcomeMessage: (row.welcome_message || '').trim(), settings, documents };
+}
+
+async function loadBotFromFolder(botId) {
   const folder = path.join(BOTS_DIR, botId);
   let instructions;
   try {
@@ -170,6 +228,11 @@ async function loadBot(botId) {
   }
 
   const documents = await loadDocuments(path.join(folder, 'documents'));
+  return { instructions, welcomeMessage, settings, documents };
+}
+
+function buildBot({ instructions, welcomeMessage, settings, documents }) {
+  if (!instructions) throw new Error('the instructions are empty');
   const totalChars = documents.reduce((sum, doc) => sum + doc.text.length, 0);
   if (totalChars > MAX_DOCUMENT_CHARS) {
     throw new Error(`documents total ${totalChars} characters; the limit is ${MAX_DOCUMENT_CHARS}`);
@@ -184,9 +247,7 @@ async function loadBot(botId) {
   }
 
   const maxTurns = parseInt(settings.max_turns, 10) > 0 ? parseInt(settings.max_turns, 10) : DEFAULT_MAX_TURNS;
-  const bot = { settings, welcomeMessage, systemPrompt, maxTurns };
-  botCache.set(botId, bot);
-  return bot;
+  return { settings, welcomeMessage, systemPrompt, maxTurns };
 }
 
 async function loadDocuments(folder) {
