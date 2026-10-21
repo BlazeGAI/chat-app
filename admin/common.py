@@ -55,14 +55,44 @@ def sign_in(email: str, password: str) -> str | None:
     email = email.strip().lower()
     try:
         auth_client().auth.sign_in_with_password({"email": email, "password": password})
-    except Exception:
-        return "That email and password didn't match."
-    row = db().table("staff").select("role").eq("email", email).maybe_single().execute()
+    except Exception as err:
+        return sign_in_problem(err)
+    try:
+        row = db().table("staff").select("role").eq("email", email).maybe_single().execute()
+    except Exception as err:
+        auth_client().auth.sign_out()
+        return (
+            f"You signed in, but the staff list couldn't be read ({err}). "
+            "Check SUPABASE_SERVICE_ROLE_KEY in the app's Secrets, and that supabase/schema.sql has been run."
+        )
     if not row or not row.data:
         auth_client().auth.sign_out()
         return "Your account isn't on the staff list yet. Ask an admin to add you."
     st.session_state.user = {"email": email, "role": row.data["role"]}
     return None
+
+
+def sign_in_problem(err: Exception) -> str:
+    """A plain-language reason a sign-in failed, so setup mistakes aren't mistaken for a wrong password."""
+    code = getattr(err, "code", None)
+    message = getattr(err, "message", None) or str(err)
+    if code == "invalid_credentials":
+        return "That email and password didn't match."
+    if code == "email_not_confirmed":
+        return (
+            "This account hasn't been confirmed. In Supabase, delete the user and add them again "
+            "with Auto Confirm User ticked."
+        )
+    if code == "email_provider_disabled":
+        return "Email sign-in is turned off. In Supabase, turn on Authentication → Sign In / Providers → Email."
+    if "api key" in message.lower():
+        return (
+            "Supabase rejected the app's key. Check SUPABASE_ANON_KEY in the app's Secrets: it must be the "
+            "publishable (anon) key from the same project as SUPABASE_URL."
+        )
+    if isinstance(err, KeyError):
+        return f"The app's Secrets are missing {err}. Add it under Settings → Secrets."
+    return f"Sign-in failed: {message}. Check SUPABASE_URL and SUPABASE_ANON_KEY in the app's Secrets."
 
 
 def sign_out():
